@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>kerning-ja.js Test Suite</title>
+  <!-- Load local jQuery. This can be overridden with a ?jquery=___ param. -->
+  <script src="../libs/jquery-loader.js"></script>
+  <!-- Load local QUnit. -->
+  <link rel="stylesheet" href="../libs/qunit/qunit.css" media="screen">
+  <script src="../libs/qunit/qunit.js"></script>
+  <!-- Load local lib and tests. -->
+  <script src="../src/kerning-ja.js"></script>
+  <script src="kerning_test.js"></script>
+  <!-- Removing access to jQuery and $. But it'll still be available as _$, if
+       you REALLY want to mess around with jQuery in the console. REMEMBER WE
+       ARE TESTING A PLUGIN HERE, THIS HELPS ENSURE BEST PRACTICES. REALLY. -->
+  <script>window._$ = jQuery.noConflict(true);</script>
+</head>
+<body>
+  
+  <div id="qunit"></div>
+  
+  <div id="qunit-fixture">
+    <h1>これは、テストです。</h1>
+    <h2>これはテストですが役物がありません</h2>
+    <h3>あいうえお。かきくけこ。さしすせそ。</h3>
+    <p id="paragraph">あのイーハトーヴォのすきとおった風、夏でも底に冷たさをもつ青いそら、うつくしい森で飾られたモーリオ市、郊外のぎらぎらひかる草の波。</p>
+    <p id="deep_extend">あいうえお。</p>
+    
+    <p id="data_attr" data-kerning>あのイーハトーヴォのすきとおった風、夏でも底に冷たさをもつ青いそら、うつくしい森で飾られたモーリオ市、郊外のぎらぎらひかる草の波。</p>
+
+    <p id="data_attr_json" data-kerning='{data:{kerning:{"あ":[-0.5,-0.5]}}}'>あのイーハトーヴォのすきとおった風、夏でも底に冷たさをもつ青いそら、うつくしい森で飾られたモーリオ市、郊外のぎらぎらひかる草の波。</p>
+
+  </div>
+
+</body>
+</html>

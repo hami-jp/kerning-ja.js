@@ -1,0 +1,23 @@
+{
+    "name": "kerning-ja",
+    "version": "0.1.0",
+    "main": "dist/kerning-ja.min.js",
+    "ignore": [
+        "data/**",
+        "fonts/**",
+        "libs/**",
+        "node_modules/**",
+        "script/**",
+        "src/**",
+        "style/**",
+        "test/**",
+        ".travis.yml",
+        ".gitignore",
+        "CONTRIBUTING.md",
+        "example.html",
+        "Gruntfile.coffee",
+        "kerning.jquery.json",
+        "package.json",
+        "README.md"
+    ]
+}
