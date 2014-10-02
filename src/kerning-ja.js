@@ -122,13 +122,19 @@
     return target;
   }
 
-  Kerning.defaults = {
-    removeTags: false,
-    removeAnchorTags: false,
+  Kerning.define = {
     singleByteSymbol: {
       "！": "!",
       "？": "?"
     },
+    lightWeightCharacter: '「」'
+  };
+
+  Kerning.defaults = {
+    removeTags: false,
+    removeAnchorTags: false,
+    singleByteSymbol: false,
+    lightWeightBracket: 100,
     data: {
       kerning: {
         "、": [0, -0.4],
@@ -264,8 +270,8 @@
       }
 
       function replaceToSingleByteSymbol(str) {
-        var pattern = options.singleByteSymbol;
-        if (!pattern) return str;
+        if (!options.singleByteSymbol) return str;
+        var pattern = Kerning.define.singleByteSymbol;
         for(var i in pattern) {
           str = str.replace(new RegExp(i, 'g'), pattern[i]);
         }
@@ -286,6 +292,10 @@
           if (R != 0) {
             style.push('margin-right:' + R + 'em');
           }
+        }
+
+        if (options.lightWeightBracket && Kerning.define.lightWeightCharacter.indexOf(char) != -1) {
+          style.push('font-weight:' + options.lightWeightBracket);
         }
 
         return style.length < 2 ? char : '<span data-kerned style="' + style.join(';') + '">' + char + '</span>';
