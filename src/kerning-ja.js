@@ -133,9 +133,10 @@
   Kerning.defaults = {
     removeTags: false,
     removeAnchorTags: false,
+    bracketWeight: 100,
     adjustSymbol: true,
     adjustAlphabet: ['font-size:1.0714em'],
-    bracketWeight: 100,
+    adjustKatakana: ['margin-left:-0.05em', 'margin-right:-0.05em'],
     data: {
       kerning: {
         "、": [0, -0.4],
@@ -285,6 +286,13 @@
         return char.match(/[a-z]/i) ? typeof style == 'string' ? [style] : style : [];
       }
 
+      function adjustKatakana(char) {
+        var style = options.adjustKatakana,
+            unicode = char.charCodeAt(0);
+        if (!style || kdata.hasOwnProperty(char)) return [];
+        return unicode >= 0x30a0 && unicode <= 0x30ff ? typeof style == 'string' ? [style] : style : [];
+      }
+
       function adjustBracketWeight(char) {
         if (!options.bracketWight) return [];
         return Kerning.define.bracketWeightCharacters.indexOf(char) != -1 ? ['font-weight:' + options.bracketWeight] : [];
@@ -306,6 +314,7 @@
 
         style = style.concat(adjustBracketWeight(char));
         style = style.concat(adjustAlphabet(char));
+        style = style.concat(adjustKatakana(char));
 
         return style.length < 2 ? char : '<span data-kerned style="' + style.join(';') + '">' + char + '</span>';
       }
