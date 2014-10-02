@@ -1,6 +1,21 @@
 'use strict';
 (function(global, d) {
 
+  var _type = Object.prototype.toString;
+
+  var isScalar = function(variable) {
+    var _ref;
+    return ((_ref = _type.call(variable)) !== '[object Array]' && _ref !== '[object Object]') || variable === null;
+  };
+
+  var isObject = function(variable) {
+    return variable !== null && _type.call(variable) === '[object Object]';
+  };
+
+  var isArray = function(variable) {
+    return _type.call(variable) === '[object Array]';
+  };
+
   var merge = function(left, right) {
     var obj = {};
     for (var attrName in left) {
@@ -13,23 +28,8 @@
   };
 
   var mergeRecursive = (function() {
-    var isArray, isObject, isScalar, merge, mergeArray, mergeObject, _type,
+    var  merge, mergeArray, mergeObject,
       __slice = [].slice;
-
-    _type = Object.prototype.toString;
-
-    isScalar = function(variable) {
-      var _ref;
-      return ((_ref = _type.call(variable)) !== '[object Array]' && _ref !== '[object Object]') || variable === null;
-    };
-
-    isObject = function(variable) {
-      return variable !== null && _type.call(variable) === '[object Object]';
-    };
-
-    isArray = function(variable) {
-      return _type.call(variable) === '[object Array]';
-    };
 
     merge = function(left, right) {
       var leftType, rightType;
@@ -123,18 +123,19 @@
   }
 
   Kerning.define = {
-    singleByteSymbol: {
+    singleByteSymbols: {
       "！": "!",
       "？": "?"
     },
-    lightWeightCharacter: '「」'
+    bracketWeightCharacters: "「」"
   };
 
   Kerning.defaults = {
     removeTags: false,
     removeAnchorTags: false,
-    singleByteSymbol: false,
-    lightWeightBracket: 100,
+    adjustSymbol: true,
+    adjustAlphabet: ['font-size:1.0714em'],
+    bracketWeight: 100,
     data: {
       kerning: {
         "、": [0, -0.4],
@@ -269,19 +270,28 @@
         fragment.outerHTML = fragment.innerHTML;
       }
 
-      function replaceToSingleByteSymbol(str) {
-        if (!options.singleByteSymbol) return str;
-        var pattern = Kerning.define.singleByteSymbol;
+      function adjustSymbol(str) {
+        if (!options.adjustSymbol) return str;
+        var pattern = Kerning.define.singleByteSymbols;
         for(var i in pattern) {
           str = str.replace(new RegExp(i, 'g'), pattern[i]);
         }
         return str;
       }
 
+      function adjustAlphabet(char) {
+        var style = options.adjustAlphabet;
+        if (!style) return [];
+        return char.match(/[a-z]/i) ? typeof style == 'string' ? [style] : style : [];
+      }
+
+      function adjustBracketWeight(char) {
+        if (!options.bracketWight) return [];
+        return Kerning.define.bracketWeightCharacters.indexOf(char) != -1 ? ['font-weight:' + options.bracketWeight] : [];
+      }
+
       function kernCharacter(char) {
         var L = 0, R = 0, style = ['display:inline-block'];
-        
-        char = replaceToSingleByteSymbol(char);
         
         if (kdata.hasOwnProperty(char)) {
           L = kdata[char][0];
@@ -294,16 +304,15 @@
           }
         }
 
-        if (options.lightWeightBracket && Kerning.define.lightWeightCharacter.indexOf(char) != -1) {
-          style.push('font-weight:' + options.lightWeightBracket);
-        }
+        style = style.concat(adjustBracketWeight(char));
+        style = style.concat(adjustAlphabet(char));
 
         return style.length < 2 ? char : '<span data-kerned style="' + style.join(';') + '">' + char + '</span>';
       }
 
       function kernString(strArray) {
         var i, iz, content = '';
-        strArray = replaceToSingleByteSymbol(strArray);
+        strArray = adjustSymbol(strArray);
         for (i = 0, iz = strArray.length; i < iz; i++) {
           content += kernCharacter(strArray[i]);
         }
