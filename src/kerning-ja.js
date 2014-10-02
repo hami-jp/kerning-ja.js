@@ -125,6 +125,10 @@
   Kerning.defaults = {
     removeTags: false,
     removeAnchorTags: false,
+    singleByteSymbol: {
+      "！": "!",
+      "？": "?"
+    },
     data: {
       kerning: {
         "、": [0, -0.4],
@@ -259,24 +263,39 @@
         fragment.outerHTML = fragment.innerHTML;
       }
 
-      function kernString(strArray) {
-        var i, iz, str, L, R, content = '';
-        for (i = 0, iz = strArray.length; i < iz; i++) {
-          str = strArray[i];
-          L = 0;
-          R = 0;
-          if (kdata[str]) {
-            L = kdata[str][0];
-            R = kdata[str][1];
+      function replaceToSingleByteSymbol(str) {
+        var pattern = options.singleByteSymbol;
+        if (!pattern) return str;
+        for(var i in pattern) {
+          str = str.replace(new RegExp(i, 'g'), pattern[i]);
+        }
+        return str;
+      }
 
-            if (L != 0 || R != 0) {
-              content += '<span data-kerned style="display:inline-block;margin-left:' + L + 'em;margin-right:' + R + 'em;">' + str + '</span>';
-            } else {
-              content += str;
-            }
-          } else {
-            content += str;
+      function kernCharacter(char) {
+        var L = 0, R = 0, style = ['display:inline-block'];
+        
+        char = replaceToSingleByteSymbol(char);
+        
+        if (kdata.hasOwnProperty(char)) {
+          L = kdata[char][0];
+          R = kdata[char][1];
+          if (L != 0) {
+            style.push('margin-left:' + L + 'em');
           }
+          if (R != 0) {
+            style.push('margin-right:' + R + 'em');
+          }
+        }
+
+        return style.length < 2 ? char : '<span data-kerned style="' + style.join(';') + '">' + char + '</span>';
+      }
+
+      function kernString(strArray) {
+        var i, iz, content = '';
+        strArray = replaceToSingleByteSymbol(strArray);
+        for (i = 0, iz = strArray.length; i < iz; i++) {
+          content += kernCharacter(strArray[i]);
         }
         return content;
       }
